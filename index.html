@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carlos Felicidades </title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+
+  }
+  #game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom, #ff77a9, #ff9eb3); /* Agrega el degradado de colores rosas */
+  }
+  #player {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 0;
+    background-image: url('image1.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .obstacle {
+    position: absolute;
+    width: 120px; /* Ajustar el tamaño del obstáculo */
+    height: 120px; /* Ajustar el tamaño del obstáculo */
+    background-image: url('image2.png');
+    background-size: cover;
+    transform-origin: center bottom; /* Establecer el punto de origen de la transformación */
+  }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="player"></div>
+  <div id="score">Score: 0</div> <!-- Agregamos el elemento para el contador de score -->
+
+</div>
+<script>
+  const player = document.getElementById('player');
+  const gameContainer = document.getElementById('game-container');
+  const scoreElement = document.getElementById('score'); // Elemento del contador de score
+
+  
+  let playerX = gameContainer.clientWidth / 2 - player.clientWidth / 2;
+  const playerSpeed = 5;
+
+  
+  player.style.left = `${playerX}px`;
+  
+  let score = 0;
+  let consecutiveAvoided = 0;
+  
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+      playerX -= playerSpeed;
+    } else if (event.key === 'ArrowRight') {
+      playerX += playerSpeed;
+    }
+    
+    if (playerX < 0) {
+      playerX = 0;
+    } else if (playerX > gameContainer.clientWidth - player.clientWidth) {
+      playerX = gameContainer.clientWidth - player.clientWidth;
+    }
+    
+    player.style.left = `${playerX}px`;
+  });
+  
+  setInterval(() => {
+    const obstacle = document.createElement('div');
+    obstacle.classList.add('obstacle');
+    const randomX = Math.random() * (gameContainer.clientWidth - 120);
+    obstacle.style.left = `${randomX}px`;
+    gameContainer.appendChild(obstacle);
+    
+    const fallSpeed = 2;
+    
+    const fallInterval = setInterval(() => {
+      const obstacleTop = obstacle.offsetTop + fallSpeed;
+      obstacle.style.top = `${obstacleTop}px`;
+      
+      if (obstacleTop > gameContainer.clientHeight) {
+        clearInterval(fallInterval);
+        gameContainer.removeChild(obstacle);
+      }
+      
+      if (
+        obstacleTop + obstacle.clientHeight > gameContainer.clientHeight - player.clientHeight &&
+        obstacleTop < gameContainer.clientHeight - player.clientHeight + player.clientHeight / 2 &&
+        obstacle.offsetLeft + obstacle.clientWidth > playerX &&
+        obstacle.offsetLeft < playerX + player.clientWidth
+      ) {
+        alert('Game Over: Has caído en la tentación, es normal, yo también lo haría');
+        location.reload();
+      }
+    }, 16);
+    
+    score++;
+    consecutiveAvoided = 0;
+    scoreElement.textContent = `Score: ${score}`;
+    
+    if (score === 23) {
+      alert('Felicidades, has conseguido respetar a Salma');
+      location.reload();
+    }
+  }, 1000);
+</script>
+</body>
+</html>
